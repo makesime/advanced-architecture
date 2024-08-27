@@ -9,4 +9,4 @@ import { OrmAlarmRepository } from './repositories/alarm.repository';
   providers: [{ provide: AlarmRepository, useClass: OrmAlarmRepository }],
   exports: [AlarmRepository],
 })
-export class OrmAlarmRepositoryModule {}
+export class OrmAlarmPersistenceModule {}
