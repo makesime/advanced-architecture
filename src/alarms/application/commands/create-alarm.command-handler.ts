@@ -6,9 +6,9 @@ import {
 } from '@nestjs/cqrs';
 import { CreateAlarmCommand } from './create-alarm.command';
 import { Logger } from '@nestjs/common';
-import { AlarmRepository } from '../ports/alarm.repository';
 import { AlarmFactory } from '../../domain/factories/alarm.factory';
 import { AlarmCreatedEvent } from '../../domain/events/alarm-created.event';
+import { CreateAlarmRepository } from '../ports/create-alarm.repository';
 
 @CommandHandler(CreateAlarmCommand)
 export class CreateAlarmCommandHandler
@@ -17,7 +17,7 @@ export class CreateAlarmCommandHandler
   private readonly logger = new Logger(CreateAlarmCommandHandler.name);
 
   constructor(
-    private readonly alarmRepository: AlarmRepository,
+    private readonly alarmRepository: CreateAlarmRepository,
     private readonly alarmFactory: AlarmFactory,
     private readonly eventBus: EventBus,
   ) {}

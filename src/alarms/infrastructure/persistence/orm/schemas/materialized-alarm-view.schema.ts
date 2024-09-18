@@ -1,5 +1,4 @@
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { PessimisticLockTransactionRequiredError } from 'typeorm';
 
 @Schema()
 export class MaterializedAlarmView {
@@ -16,7 +15,7 @@ export class MaterializedAlarmView {
   triggeredAt: Date;
 
   @Prop()
-  isAcknowledge: boolean;
+  isAcknowledged: boolean;
 
   @Prop(
     raw([
