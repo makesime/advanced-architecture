@@ -12,3 +12,16 @@ services:
       - 27017:27017
     environment:
       - MONGODB_DATABASE="vf-read-db"
+  event-store:
+    image: mongo:6.0.4
+    ports:
+      - 27018:27018
+    environment:
+      - MONGODB_DATABASE="vf-event-store"
+    # Enable replication and specify the name of the replica set
+    # Required to use MongoDB "change streams" to listen to changes in the Event Store, only works with Replica sets
+    command: mongod --replSet vf-event-store-repl-set
+    volumes:
+      # This file is executed when the container is started
+      # Used to initialize the Db
+      - ./scripts/event-store-mongoinit.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
