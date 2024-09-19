@@ -1,14 +1,7 @@
-import {
-  CommandBus,
-  CommandHandler,
-  EventBus,
-  ICommandHandler,
-} from '@nestjs/cqrs';
+import { CommandHandler, EventPublisher, ICommandHandler } from '@nestjs/cqrs';
 import { CreateAlarmCommand } from './create-alarm.command';
 import { Logger } from '@nestjs/common';
 import { AlarmFactory } from '../../domain/factories/alarm.factory';
-import { AlarmCreatedEvent } from '../../domain/events/alarm-created.event';
-import { CreateAlarmRepository } from '../ports/create-alarm.repository';
 
 @CommandHandler(CreateAlarmCommand)
 export class CreateAlarmCommandHandler
@@ -17,11 +10,16 @@ export class CreateAlarmCommandHandler
   private readonly logger = new Logger(CreateAlarmCommandHandler.name);
 
   constructor(
-    private readonly alarmRepository: CreateAlarmRepository,
+    private readonly eventPublisher: EventPublisher,
     private readonly alarmFactory: AlarmFactory,
-    private readonly eventBus: EventBus,
   ) {}
 
+  /**
+   * Merging the publisher context with the aggregate instance will allow us to use the apply method of the aggregate
+   * To apply the event to the aggregate, and then commit the changes to the Event Store
+   * This is a CRUCIAL step as otherwise the event would NEVER reach the event store!
+   * @param command
+   */
   async execute(command: CreateAlarmCommand) {
     this.logger.debug(
       `Processing "CreateAlarmCommand": ${JSON.stringify(command)} `,
@@ -32,13 +30,9 @@ export class CreateAlarmCommandHandler
       command.triggeredAt,
       command.items,
     );
-    const newAlarm = this.alarmRepository.save(alarm);
+    this.eventPublisher.mergeObjectContext(alarm);
+    alarm.commit();
 
-    // This is not yet the best way to dispatch events.
-    // Domain events should be dispatched from the aggregate root, inside the domain layer.
-    // We'll cover this in the upcoming lessons.
-    this.eventBus.publish(new AlarmCreatedEvent(alarm)); // 👈
-
-    return newAlarm;
+    return alarm;
   }
 }
