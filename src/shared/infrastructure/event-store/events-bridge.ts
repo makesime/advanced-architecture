@@ -6,6 +6,7 @@ import { Model } from 'mongoose';
 import { EventBus } from '@nestjs/cqrs';
 import { EventDocument } from './schemas/event.schema';
 import { EventDeserializer } from './deserializer/event.deserializer';
+import { Event } from './schemas/event.schema';
 
 export class EventsBridge
   implements OnApplicationBootstrap, OnApplicationShutdown
